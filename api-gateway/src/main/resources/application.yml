@@ -1,0 +1,56 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  security:
+    user:
+      name: admin        # 👈 Username for actuator access
+      password: admin123 # 👈 Password for actuator access
+
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/users/**
+          filters:
+            - StripPrefix=1
+
+        - id: customer-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/orders/**
+          filters:
+            - StripPrefix=1
+
+        - id: loan-applications-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/loans/**
+          filters:
+            - StripPrefix=1
+
+        - id: documents-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/documents/**
+          filters:
+            - StripPrefix=1
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: gateway, routes, health, info
+  endpoint:
+    health:
+      show-details: always
